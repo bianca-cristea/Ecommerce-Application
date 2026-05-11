@@ -1,0 +1,5 @@
+package org.example.backend.models;
+
+public enum AppRoles {
+        ROLE_USER,ROLE_SELLER,ROLE_ADMIN
+}
