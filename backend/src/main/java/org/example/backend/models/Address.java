@@ -19,7 +19,7 @@ public class Address {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "address_id")
-    private Long id;
+    private Long addressId;
 
     @NotBlank
     @Size(min = 3,message = "Building name should have at least 3 characters.")

@@ -17,7 +17,7 @@ import java.util.List;
 public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long productId;
 
     @NotBlank
     @Size(min = 6, message = "Product description must contain at least 6 characters")

@@ -18,7 +18,7 @@ public class Cart {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "cart_id")
-    private Long id;
+    private Long cartId;
 
     @Column(name = "total_price")
     private Double totalPrice= 0.0;
