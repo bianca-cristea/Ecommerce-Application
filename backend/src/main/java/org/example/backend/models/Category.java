@@ -5,7 +5,9 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -23,6 +25,6 @@ public class Category {
     private String categoryName;
 
     @OneToMany(mappedBy = "category", cascade = {CascadeType.MERGE,CascadeType.PERSIST}, orphanRemoval = true)
-    private Set<Product> products = new HashSet<>();
+    private List<Product> products = new ArrayList<>();
 
 }
