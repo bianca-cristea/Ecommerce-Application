@@ -10,9 +10,5 @@ import java.util.List;
 
 @Repository
 public interface CategoryRepository extends JpaRepository<Category,Long> {
-    List<Cart> findCartByProductId(Long productId);
-
-    List<Cart> findCartsByProductId(Long productId);
-
-    Category findByCategoryName(@NotBlank String categoryName);
+        Category findByCategoryName(@NotBlank String categoryName);
 }

@@ -10,7 +10,6 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
@@ -28,7 +27,7 @@ public class CategoryServiceImpl implements CategoryService{
 
     @Override
     public CategoryResponse getAllCategories(Integer pageNumber, Integer pageSize, String orderBy, String orderDir) {
-        Sort sortByAndOrder = orderBy.equalsIgnoreCase("asc")?
+        Sort sortByAndOrder = orderDir.equalsIgnoreCase("asc")?
                                Sort.by(orderBy).ascending():
                                Sort.by(orderBy).descending();
 
