@@ -4,7 +4,6 @@ import jakarta.validation.Valid;
 import org.example.backend.config.AppConstants;
 import org.example.backend.payload.ProductDTO;
 import org.example.backend.payload.ProductResponse;
-import org.example.backend.repositories.ProductRepository;
 import org.example.backend.services.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -82,7 +81,7 @@ public class ProductController {
     }
 
     @PutMapping("/admin/product/{productId}/image")
-    public ResponseEntity<ProductDTO> updateProductImage(@PathVariable Long productId, @RequestParam("image") MultipartFile image){
+    public ResponseEntity<ProductDTO> updateProductImage(@PathVariable Long productId, @RequestParam("image") MultipartFile image) throws IOException {
         return new ResponseEntity<>(productService.updateProductImage(productId,image),HttpStatus.OK);
     }
 

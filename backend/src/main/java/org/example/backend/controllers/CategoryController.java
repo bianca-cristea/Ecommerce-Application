@@ -2,7 +2,6 @@ package org.example.backend.controllers;
 
 import jakarta.validation.Valid;
 import org.example.backend.config.AppConstants;
-import org.example.backend.models.Category;
 import org.example.backend.payload.CategoryDTO;
 import org.example.backend.payload.CategoryResponse;
 import org.example.backend.services.CategoryService;

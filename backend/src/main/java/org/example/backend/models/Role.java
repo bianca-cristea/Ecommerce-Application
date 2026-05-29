@@ -7,6 +7,7 @@ import lombok.ToString;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.spi.ToolProvider;
 
 @Entity
 @NoArgsConstructor
@@ -22,10 +23,12 @@ public class Role {
     @Column(name = "role")
     @ToString.Exclude
     @Enumerated(EnumType.STRING)
-    private AppRoles role;
+    private AppRoles roleName;
 
 
     public Role(AppRoles role) {
-        this.role = role;
+        this.roleName = role;
     }
+
+
 }

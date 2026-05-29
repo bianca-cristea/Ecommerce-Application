@@ -124,7 +124,7 @@ public class ProductServiceImpl implements ProductService {
                 Sort.by(sortBy).descending();
 
         Pageable pageDetails = PageRequest.of(pageNumber,pageSize,sortByAndOrder);
-        Page<Product> pageProducts = productRepository.findByCategoryId(categoryId,pageDetails);
+        Page<Product> pageProducts = productRepository.findByCategoryCategoryId(categoryId,pageDetails);
 
         List<Product> products = pageProducts.getContent();
         if(products.isEmpty()) throw new APIException("Category does not have any products.");
@@ -197,7 +197,7 @@ public class ProductServiceImpl implements ProductService {
 
         Product savedProd = productRepository.save(prodFromDB);
 
-        List<Cart> carts = cartRepository.findCartByProductId(productId);
+        List<Cart> carts = cartRepository.findCartsByProductId(productId);
         carts.forEach(cart ->
                 cart.getCartItems().forEach(item -> {
                     if(item.getProduct().getProductId().equals(productId)){
@@ -214,7 +214,7 @@ public class ProductServiceImpl implements ProductService {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new ResourceNotFoundException("Product", "productId", productId));
 
-        List<Cart> carts = cartRepository.findCartByProductId(productId);
+        List<Cart> carts = cartRepository.findCartsByProductId(productId);
         carts.forEach(cart -> cartService.deleteProductFromCart(cart.getCartId(),productId));
 
         productRepository.delete(product);

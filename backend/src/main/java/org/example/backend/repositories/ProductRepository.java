@@ -11,5 +11,5 @@ import org.springframework.stereotype.Repository;
 public interface ProductRepository extends JpaRepository<Product,Long> , JpaSpecificationExecutor<Product> {
     Page<Product> findProductsByProductNameLikeIgnoreCase(String s, Pageable pageDetails);
 
-    Page<Product> findByCategoryId(Long categoryId, Pageable pageDetails);
+    Page<Product> findByCategoryCategoryId(Long categoryId, Pageable pageDetails);
 }

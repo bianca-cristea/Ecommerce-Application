@@ -15,24 +15,30 @@ import java.util.*;
 @Table(name = "orders")
 public class Order {
 
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long orderId;
 
-    @NotBlank
     @Email
-    @Column(name = "email")
+    @Column(nullable = false)
     private String email;
 
-    private LocalDate orderDate;
-    private String orderStatus;
-    private Double totalAmount;
-
-    @OneToMany(mappedBy = "order" ,cascade = {CascadeType.MERGE, CascadeType.PERSIST}, orphanRemoval = true)
+    @OneToMany(mappedBy = "order",cascade = {CascadeType.PERSIST,CascadeType.MERGE})
     private List<OrderItem> orderItems = new ArrayList<>();
+
+    private LocalDate orderDate;
 
     @OneToOne
     @JoinColumn(name = "payment_id")
     private Payment payment;
+
+    private Double totalAmount;
+
+    private String orderStatus;
+
+    @ManyToOne
+    @JoinColumn(name = "address_id")
+    private Address address;
 
 }
