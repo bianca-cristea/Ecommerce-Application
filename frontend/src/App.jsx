@@ -1,16 +1,17 @@
 import { useState } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import { FaBeer } from 'react-icons/fa';
+import heroImg from './assets/hero.png' 
 import './App.css'
+import Products from './components/Products.jsx';
  
 
 function App() {
  return (  
-  <h1 class="text-3xl font-bold underline text-black">
-   Welcome <FaBeer />
-  </h1>  )
+ <div>
+    <Products/>
+ </div>
+ )
 
 }
 

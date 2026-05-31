@@ -48,10 +48,10 @@ public class ProductServiceImpl implements ProductService {
     @Autowired
     private  FileService fileService;
 
-    @Value("${image.path}")
+
+
+    @Value("${project.image}")
     private String path;
-
-
 
     @Override
     public ProductResponse getAllProducts(String keyword, String category, Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) {
@@ -168,6 +168,7 @@ public class ProductServiceImpl implements ProductService {
             //newProd.setUser();
             newProd.setProductName(productDTO.getProductName());
             newProd.setPrice(productDTO.getPrice());
+            newProd.setDescription(productDTO.getDescription());
             newProd.setQuantity(productDTO.getQuantity());
             newProd.setDiscount(productDTO.getDiscount());
             double specialPrice = productDTO.getPrice() - (productDTO.getDiscount() * 0.01) * productDTO.getPrice();
@@ -190,6 +191,7 @@ public class ProductServiceImpl implements ProductService {
 
         prodFromDB.setProductName(productDTO.getProductName());
         prodFromDB.setPrice(productDTO.getPrice());
+        prodFromDB.setDescription(productDTO.getDescription());
         prodFromDB.setQuantity(productDTO.getQuantity());
         prodFromDB.setDiscount(productDTO.getDiscount());
         double specialPrice = productDTO.getPrice() - (productDTO.getDiscount() * 0.01) * productDTO.getPrice();
@@ -224,16 +226,17 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public ProductDTO updateProductImage(Long productId, MultipartFile image) throws IOException {
-
-        Product productFromDB = productRepository.findById(productId)
+        Product productFromDb = productRepository.findById(productId)
                 .orElseThrow(() -> new ResourceNotFoundException("Product", "productId", productId));
 
-        String fileName = fileService.uploadImage(path,image);
-        productFromDB.setImage(fileName);
+        String fileName = fileService.uploadImage(path, image);
+        productFromDb.setImage(fileName);
 
-        Product updatedProduct = productRepository.save(productFromDB);
-        return modelMapper.map(updatedProduct,ProductDTO.class);
+        Product updatedProduct = productRepository.save(productFromDb);
+        return modelMapper.map(updatedProduct, ProductDTO.class);
     }
+
+
 
 
     @Override

@@ -14,10 +14,10 @@ public class ProductDTO {
     private Long productId;
     private String description;
     private Double discount;
-    //private String  image;
+    private String  image;
     private Double price;
     private String productName;
     private Integer quantity;
-    //private Double specialPrice;
+    private Double specialPrice;
 
 }

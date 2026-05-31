@@ -25,165 +25,150 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.support.TransactionTemplate;
+
 
 import java.util.Set;
 
-@Configuration // spune lui Spring că această clasă conține configurări
-@EnableWebSecurity // activează securitatea web în Spring
-@EnableMethodSecurity // permite securitate la nivel de metode (ex: @PreAuthorize)
-public class WebSecurityConfig {
 
-    @Autowired
-    UserDetailsServiceImpl userDetailsService;
-    // aducem clasa ta care spune cum se încarcă userii din DB
+    @Configuration
+    @EnableWebSecurity
+//@EnableMethodSecurity
+    public class WebSecurityConfig {
+        @Autowired
+        UserDetailsServiceImpl userDetailsService;
 
-    @Autowired
-    private AuthEntryPointJwt unauthorizedHandler;
-    // ce se întâmplă dacă userul NU este autorizat (ex: 401 Unauthorized)
+        @Autowired
+        private AuthEntryPointJwt unauthorizedHandler;
+
+        @Bean
+        public AuthTokenFilter authenticationJwtTokenFilter() {
+            return new AuthTokenFilter();
+        }
 
 
-    //cream obiectul AuthTokenFilter
-    @Bean
-    public AuthTokenFilter authenticationJwtTokenFilter() {
-        return new AuthTokenFilter();
-        // filtru custom care citește JWT din request
-    }
+        @Bean
+        public DaoAuthenticationProvider authenticationProvider() {
+            DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider(userDetailsService);
 
-    //logica de verificare a autentificării
-    @Bean
-    public DaoAuthenticationProvider authenticationProvider() {
-        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider(userDetailsService);
-        // folosește userDetailsService pentru autentificare
+//        authProvider.setUserDetailsService(userDetailsService);
+            authProvider.setPasswordEncoder(passwordEncoder());
 
-        authProvider.setPasswordEncoder(passwordEncoder());
-        // spune cum sunt codate parolele
+            return authProvider;
+        }
 
-        return authProvider;
-    }
 
-    @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
-        return authConfig.getAuthenticationManager();
-        // managerul principal de autentificare
-    }
+        @Bean
+        public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
+            return authConfig.getAuthenticationManager();
+        }
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-        // parolele sunt criptate cu BCrypt (foarte important!)
-    }
-
-    @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http
-                .csrf(csrf -> csrf.disable())
-                // dezactivează CSRF (ok pentru API-uri REST cu JWT)
-                // CSRF = protecție împotriva request-urilor false trimise în numele userului
-                // Dezactivat deoarece folosim JWT (stateless, fără sesiuni)
+        @Bean
+        public PasswordEncoder passwordEncoder() {
+            return new BCryptPasswordEncoder();
+        }
 
 
 
-                .cors(cors -> {})
-                // CORS = permite frontend-ului (alt domeniu) să apeleze API-ul
-                // Necesare pentru aplicații cu frontend separat (React, Angular etc.)
+        @Bean
+        public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+            http.csrf(csrf -> csrf.disable())
+                    .cors(cors -> {})
+                    .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
+                    .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                    .authorizeHttpRequests(auth ->
+                            auth.requestMatchers("/api/auth/**").permitAll()
+                                    .requestMatchers("/v3/api-docs/**").permitAll()
+                                    .requestMatchers("/h2-console/**").permitAll()
+                                    .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                                    .requestMatchers("/api/seller/**").hasAnyRole("ADMIN","SELLER")
+                                    //.requestMatchers("/api/admin/**").permitAll()
+                                    .requestMatchers("/api/public/**").permitAll()
+                                    .requestMatchers("/swagger-ui/**").permitAll()
+                                    .requestMatchers("/api/test/**").permitAll()
+                                    .requestMatchers("/images/**").permitAll()
+                                    .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                                    .anyRequest().authenticated()
+                    );
 
-                .exceptionHandling(exception ->
-                        exception.authenticationEntryPoint(unauthorizedHandler))
-                // dacă nu ești logat → handler custom
+            http.authenticationProvider(authenticationProvider());
 
-                .sessionManagement(session ->
-                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                // NU folosește sesiuni → JWT (stateless)
+            http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
+            http.headers(headers -> headers.frameOptions(
+                    frameOptions -> frameOptions.sameOrigin()));
 
-                .authorizeHttpRequests(auth ->
-                                auth.requestMatchers("/api/auth/**").permitAll() // login/register → acces liber
-                                        .requestMatchers("/v3/api-docs/**").permitAll()
-                                        .requestMatchers("/h2-console/**").permitAll() // dev tools → acces liber
-                                        //.requestMatchers("/api/admin/**").hasRole("ADMIN") // doar ADMIN
-                                        .requestMatchers("/api/seller/**").hasAnyRole("ADMIN","SELLER") // ADMIN sau SELLER
-                                        //.requestMatchers("/api/public/**").permitAll() // public
-                                        .requestMatchers("/swagger-ui/**").permitAll()
-                                        .requestMatchers("/api/test/**").permitAll()
-                                        .requestMatchers("/images/**").permitAll()
-                                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                                        // pentru CORS preflight
+            return http.build();
+        }
 
-                                        .anyRequest().authenticated()
-                        // orice alt request → trebuie login
-                );
-
-        http.authenticationProvider(authenticationProvider()); // spune ce provider de autentificare folosește
-        http.addFilterBefore(authenticationJwtTokenFilter(),
-                UsernamePasswordAuthenticationFilter.class);  // adaugă filtrul JWT înainte de filtrul standard
-        http.headers(headers ->
-                headers.frameOptions(frame -> frame.sameOrigin()));  // permite H2 console în browser
-
-        return http.build();
-    }
-
-    @Bean
-    public WebSecurityCustomizer webSecurityCustomizer() {
-        return (web -> web.ignoring().requestMatchers(
-                "/v2/api-docs",
-                "/configuration/ui",
-                "/swagger-resources/**",
-                "/configuration/security",
-                "/swagger-ui.html",
-                "/webjars/**"));
-        // aceste endpoint-uri sunt complet ignorate de securitate
-    }
+        @Bean
+        public WebSecurityCustomizer webSecurityCustomizer() {
+            return (web -> web.ignoring().requestMatchers("/v2/api-docs",
+                    "/configuration/ui",
+                    "/swagger-resources/**",
+                    "/configuration/security",
+                    "/swagger-ui.html",
+                    "/webjars/**"));
+        }
 
 
-    // ---------------------------------------------------------------------
-    // FIXED: initData using TransactionTemplate
-    // ---------------------------------------------------------------------
-    @Bean
-    public CommandLineRunner initData(RoleRepository roleRepository,
-                                      UserRepository userRepository,
-                                      PasswordEncoder passwordEncoder,
-                                      PlatformTransactionManager platformTransactionManager) { // 1. Inject Transaction Manager
-        return args -> {
-            // 2. Create a template to control the transaction manually
-            // This ensures the fetched Roles stay "attached" to the session when we save the Users.
-            TransactionTemplate txTemplate = new TransactionTemplate(platformTransactionManager);
-
-            txTemplate.execute(status -> {
+        @Bean
+        public CommandLineRunner initData(RoleRepository roleRepository, UserRepository userRepository, PasswordEncoder passwordEncoder) {
+            return args -> {
                 // Retrieve or create roles
                 Role userRole = roleRepository.findByRoleName(AppRoles.ROLE_USER)
-                        .orElseGet(() -> roleRepository.save(new Role(AppRoles.ROLE_USER)));
+                        .orElseGet(() -> {
+                            Role newUserRole = new Role(AppRoles.ROLE_USER);
+                            return roleRepository.save(newUserRole);
+                        });
 
                 Role sellerRole = roleRepository.findByRoleName(AppRoles.ROLE_SELLER)
-                        .orElseGet(() -> roleRepository.save(new Role(AppRoles.ROLE_SELLER)));
+                        .orElseGet(() -> {
+                            Role newSellerRole = new Role(AppRoles.ROLE_SELLER);
+                            return roleRepository.save(newSellerRole);
+                        });
 
                 Role adminRole = roleRepository.findByRoleName(AppRoles.ROLE_ADMIN)
-                        .orElseGet(() -> roleRepository.save(new Role(AppRoles.ROLE_ADMIN)));
+                        .orElseGet(() -> {
+                            Role newAdminRole = new Role(AppRoles.ROLE_ADMIN);
+                            return roleRepository.save(newAdminRole);
+                        });
 
                 Set<Role> userRoles = Set.of(userRole);
                 Set<Role> sellerRoles = Set.of(sellerRole);
                 Set<Role> adminRoles = Set.of(userRole, sellerRole, adminRole);
 
+
                 // Create users if not already present
                 if (!userRepository.existsByUsername("user1")) {
                     User user1 = new User("user1", "user1@example.com", passwordEncoder.encode("password1"));
-                    user1.setRoles(userRoles);
                     userRepository.save(user1);
                 }
 
                 if (!userRepository.existsByUsername("seller1")) {
                     User seller1 = new User("seller1", "seller1@example.com", passwordEncoder.encode("password2"));
-                    seller1.setRoles(sellerRoles);
                     userRepository.save(seller1);
                 }
 
                 if (!userRepository.existsByUsername("admin")) {
                     User admin = new User("admin", "admin@example.com", passwordEncoder.encode("adminPass"));
-                    admin.setRoles(adminRoles);
                     userRepository.save(admin);
                 }
-                return null; // Transaction callback requires a return value
-            });
-        };
+
+                // Update roles for existing users
+                userRepository.findByUsername("user1").ifPresent(user -> {
+                    user.setRoles(userRoles);
+                    userRepository.save(user);
+                });
+
+                userRepository.findByUsername("seller1").ifPresent(seller -> {
+                    seller.setRoles(sellerRoles);
+                    userRepository.save(seller);
+                });
+
+                userRepository.findByUsername("admin").ifPresent(admin -> {
+                    admin.setRoles(adminRoles);
+                    userRepository.save(admin);
+                });
+            };
+        }
+
     }
-}
