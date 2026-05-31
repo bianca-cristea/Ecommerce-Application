@@ -100,6 +100,10 @@ public class ProductServiceImpl implements ProductService {
         return productResponse;
     }
 
+    private String constructImageUrl(String imageName){
+        return imageBaseUrl + (imageBaseUrl.endsWith("/") ? "" : "/") + imageName;
+    }
+
     @Override
     public ProductResponse getProductsByKeyword(String keyword, Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) {
 
@@ -248,9 +252,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
 
-    private String constructImageUrl(String imageName){
-        return imageBaseUrl.endsWith("/") ?  imageBaseUrl + imageName : "/" + imageName;
-    }
+
 
 
     @Override

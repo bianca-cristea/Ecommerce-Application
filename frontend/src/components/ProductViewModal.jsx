@@ -36,7 +36,7 @@ const ProductViewModal = ({
       className="relative z-50"
       onClose={handleClickClose}
     >
-      {/* Overlay */}
+  
       <DialogBackdrop className="fixed inset-0 bg-black/50 backdrop-blur-sm transition-opacity" />
 
       <div className="fixed inset-0 overflow-y-auto">
@@ -48,7 +48,7 @@ const ProductViewModal = ({
               transition-all
             "
           >
-            {/* Close button */}
+           
             <button
               onClick={handleClickClose}
               className="
@@ -69,14 +69,14 @@ const ProductViewModal = ({
                     src={image}
                     alt={productName}
                     className="
-                      h-[320px] w-full object-contain
+                      h-80 w-full object-contain
                       transition duration-300 hover:scale-105
                     "
                   />
                 )}
               </div>
 
-              {/* RIGHT - CONTENT */}
+            
               <div className="flex flex-col justify-between p-8">
                 <div>
                   <DialogTitle
@@ -90,7 +90,7 @@ const ProductViewModal = ({
                     {productName}
                   </DialogTitle>
 
-                  {/* Price + Status */}
+                  
                   <div className="flex items-center justify-between mb-5">
                     {specialPrice ? (
                       <div className="flex items-center gap-3">
@@ -127,7 +127,7 @@ const ProductViewModal = ({
 
                   <Divider />
 
-                  {/* Description */}
+                  
                   <div className="mt-5 space-y-2">
                     <h4 className="font-semibold text-slate-800">
                       Description
@@ -138,7 +138,7 @@ const ProductViewModal = ({
                     </p>
                   </div>
 
-                  {/* Quantity */}
+                 
                   <div className="mt-6">
                     <span className="text-sm text-gray-500">
                       Quantity:
