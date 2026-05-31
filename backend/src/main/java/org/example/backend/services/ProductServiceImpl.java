@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.io.IOError;
 import java.io.IOException;
 import java.util.List;
@@ -53,6 +54,10 @@ public class ProductServiceImpl implements ProductService {
     @Value("${project.image}")
     private String path;
 
+    @Value("${image.base.url}")
+    private String imageBaseUrl;
+
+
     @Override
     public ProductResponse getAllProducts(String keyword, String category, Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) {
 
@@ -76,7 +81,13 @@ public class ProductServiceImpl implements ProductService {
         Page<Product> pageProducts = productRepository.findAll(spec,pageDetails);
 
         List<Product> products = pageProducts.getContent();
-        List<ProductDTO> productDTOS = products.stream().map(product -> modelMapper.map(product, ProductDTO.class)).toList();
+        List<ProductDTO> productDTOS = products.stream()
+                .map(product -> {
+                    ProductDTO productDTO = modelMapper.map(product, ProductDTO.class);
+                    productDTO.setImage(constructImageUrl(product.getImage()));
+                    return productDTO;
+                })
+                .toList();
 
         ProductResponse productResponse = new ProductResponse();
         productResponse.setContent(productDTOS);
@@ -237,6 +248,9 @@ public class ProductServiceImpl implements ProductService {
     }
 
 
+    private String constructImageUrl(String imageName){
+        return imageBaseUrl.endsWith("/") ?  imageBaseUrl + imageName : "/" + imageName;
+    }
 
 
     @Override

@@ -1,5 +1,7 @@
 package org.example.backend.services;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -11,7 +13,7 @@ import java.util.UUID;
 
 @Service
 public class FileServiceImpl implements FileService {
-
+private static final Logger logger = LoggerFactory.getLogger(FileServiceImpl.class);
     @Override
     public String uploadImage(String path, MultipartFile file) throws IOException {
         String originalFileName = file.getOriginalFilename();
@@ -23,6 +25,7 @@ public class FileServiceImpl implements FileService {
         if (!folder.exists())
             folder.mkdir();
 
+//        logger.info(new File(filePath).getAbsolutePath());
         Files.copy(file.getInputStream(), Paths.get(filePath));
         return fileName;
     }
