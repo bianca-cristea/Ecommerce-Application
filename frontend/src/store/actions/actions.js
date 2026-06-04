@@ -1,11 +1,10 @@
-import api from "../../api/api";
-
- 
+import api from "../../api/api"
 
 export const fetchProducts = (url) => async (dispatch) => {
     try {
         dispatch({ type: "IS_FETCHING" });
         const { data } = await api.get(url);
+        console.log("API RESPONSE:", data);
         dispatch({
             type: "FETCH_PRODUCTS",
             payload: data.content,
@@ -15,6 +14,7 @@ export const fetchProducts = (url) => async (dispatch) => {
             totalPages: data.totalPages,
             lastPage: data.lastPage,
         });
+
         dispatch({ type: "IS_SUCCESS" });
     } catch (error) {
         console.log(error);
@@ -39,7 +39,7 @@ export const fetchCategories = () => async (dispatch) => {
             totalPages: data.totalPages,
             lastPage: data.lastPage,
         });
-        dispatch({ type: "IS_ERROR" });
+        dispatch({ type: "IS_SUCCESS" });
     } catch (error) {
         console.log(error);
         dispatch({ 
@@ -48,4 +48,4 @@ export const fetchCategories = () => async (dispatch) => {
          });
     }
 };
-
+ 

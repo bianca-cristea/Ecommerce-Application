@@ -10,7 +10,10 @@ const useProductFilter = () => {
   useEffect(() => {
     const params = new URLSearchParams();
 
-    const currentPage = searchParams.get("page") ? Number(searchParams.get("page")) : 1
+    const currentPage = searchParams.get("page") ?
+     Number(searchParams.get("page")) 
+     : 1
+
     params.set("pageNumber", currentPage - 1)
 
     const sortOrder = searchParams.get("sortBy") || "asc"
@@ -25,11 +28,12 @@ const useProductFilter = () => {
     }
 
     const queryString = params.toString() 
+    console.log("QUERY STRING", queryString);
 
-    if(categoryId){
-      dispatch(fetchProducts(`/public/categories/${categoryId}/products?${queryString}`))
+   if (categoryId) {
+      dispatch(fetchProducts(`/public/categories/${categoryId}/products?pageSize=2&${queryString}`))
     } else {
-      dispatch(fetchProducts(`/public/products?${queryString}`))
+      dispatch(fetchProducts(`/public/products?pageSize=2&${queryString}`))
     }
     
 

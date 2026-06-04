@@ -35,7 +35,7 @@ const Filter = ({categories}) => {
     }, 700);
 
     return () => clearTimeout(handler)
-  }, [searchTerm]) // ✅ doar searchTerm, altfel loop infinit
+  }, [searchTerm,categories])  
 
   const handleCategoryChange = (event) => {
     const selectedCategory = event.target.value;
@@ -44,7 +44,7 @@ const Filter = ({categories}) => {
     if(selectedCategory === "all"){
       newParams.delete("category")
     } else {
-      newParams.set("category", selectedCategory) // ✅ selectedCategory e categoryId
+      newParams.set("category", selectedCategory)  
     }
 
     navigate(`${pathName}?${newParams}`) 
@@ -62,7 +62,7 @@ const Filter = ({categories}) => {
   }
 
   const handleClearFilters = () => {
-    navigate(pathName) // ✅ fix, window.pathname nu exista
+    navigate(pathName)  
   }
 
   return (

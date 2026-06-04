@@ -39,7 +39,8 @@ const ProductCard = ({
                             })} 
           className="w-full overflow-hidden aspect-3/2">
         <img className='w-full h-full cursor-pointer transition-transform duration-300 hover:scale-105'
-        src={image}
+         src={image?.startsWith("http") ? image : `http://localhost:8080/images/${image}`}
+ 
         alt={productName}>
         </img>
         {productName}

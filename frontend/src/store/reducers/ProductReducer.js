@@ -3,12 +3,7 @@ import { act } from "react";
 const initialState = {
   products: null,
   categories: null,
-  pagination: {
-    // pageNumber: 0,
-    // pageSize: 0,
-    // totalElements: 0,
-    // totalPages: 0,
-    // lastPage: false
+  pagination: { 
   }
 };
 
@@ -30,7 +25,7 @@ export const productReducer = (state = initialState, action) => {
          case "FETCH_CATEGORIES":
             return {
                 ...state, 
-                categories: action.payload, 
+                categories: action.payload,  
             };
     
         default:
