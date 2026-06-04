@@ -59,28 +59,27 @@ public class ProductServiceImpl implements ProductService {
 
 
     @Override
-    public ProductResponse getAllProducts(String keyword, String category, Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) {
-
-        Sort sortByAndOrder = sortOrder.equalsIgnoreCase("asc") ?
-                Sort.by(sortBy).ascending() :
-                Sort.by(sortBy).descending();
+    public ProductResponse getAllProducts(String keyword,String category, Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) {
+        Sort sortByAndOrder = sortOrder.equalsIgnoreCase("asc")
+                ? Sort.by(sortBy).ascending()
+                : Sort.by(sortBy).descending();
 
         Pageable pageDetails = PageRequest.of(pageNumber, pageSize, sortByAndOrder);
-
-        Specification spec = (root,query,cb) -> cb.conjunction();
-
+        Specification<Product> spec = (root, query, cb) -> cb.conjunction();
         if (keyword != null && !keyword.isEmpty()) {
             spec = spec.and((root, query, criteriaBuilder) ->
                     criteriaBuilder.like(criteriaBuilder.lower(root.get("productName")), "%" + keyword.toLowerCase() + "%"));
         }
 
-        if(category != null && !category.isEmpty()){
-            spec = spec.and((root,query,cb) -> cb.like(cb.lower(root.get("categoryName")),category));
+        if (category != null && !category.isEmpty()) {
+            spec = spec.and((root, query, criteriaBuilder) ->
+                    criteriaBuilder.like(root.get("category").get("categoryName"), category));
         }
 
-        Page<Product> pageProducts = productRepository.findAll(spec,pageDetails);
+        Page<Product> pageProducts = productRepository.findAll(spec, pageDetails);
 
         List<Product> products = pageProducts.getContent();
+
         List<ProductDTO> productDTOS = products.stream()
                 .map(product -> {
                     ProductDTO productDTO = modelMapper.map(product, ProductDTO.class);
@@ -91,15 +90,13 @@ public class ProductServiceImpl implements ProductService {
 
         ProductResponse productResponse = new ProductResponse();
         productResponse.setContent(productDTOS);
-        productResponse.setPageNumber(productResponse.getPageNumber());
-        productResponse.setPageSize(productResponse.getPageSize());
-        productResponse.setTotalPages(productResponse.getTotalPages());
-        productResponse.setTotalElements(productResponse.getTotalElements());
-        productResponse.setLastPage(productResponse.isLastPage());
-
+        productResponse.setPageNumber(pageProducts.getNumber());
+        productResponse.setPageSize(pageProducts.getSize());
+        productResponse.setTotalElements(pageProducts.getTotalElements());
+        productResponse.setTotalPages(pageProducts.getTotalPages());
+        productResponse.setLastPage(pageProducts.isLast());
         return productResponse;
     }
-
     private String constructImageUrl(String imageName){
         return imageBaseUrl + (imageBaseUrl.endsWith("/") ? "" : "/") + imageName;
     }
