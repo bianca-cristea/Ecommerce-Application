@@ -31,9 +31,9 @@ const useProductFilter = () => {
     console.log("QUERY STRING", queryString);
 
    if (categoryId) {
-      dispatch(fetchProducts(`/public/categories/${categoryId}/products?pageSize=2&${queryString}`))
+      dispatch(fetchProducts(`/public/categories/${categoryId}/products?pageSize=4&${queryString}`))
     } else {
-      dispatch(fetchProducts(`/public/products?pageSize=2&${queryString}`))
+      dispatch(fetchProducts(`/public/products?pageSize=4&${queryString}`))
     }
     
 
