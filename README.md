@@ -117,6 +117,8 @@ http://localhost:3000
 ---
 
 ## API Documentation (Swagger)
+
+Available locally at:
 http://localhost:8080/swagger-ui/index.html
 
 ---
